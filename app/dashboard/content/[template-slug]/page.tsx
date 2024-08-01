@@ -8,6 +8,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { chatSession } from '@/utils/AiModal'
+import { db } from '@/utils/db'
+import { useUser } from '@clerk/nextjs'
+import moment from 'moment'
+import { aiOuput } from '@/utils/schema'
 
 interface PROPS{
     params:{
@@ -21,6 +25,7 @@ const CreateNewContent = (props:PROPS) => {
 
     const [loading, setLoading] = useState(false);
     const [aiOutput, setAiOuput] = useState<string>('');
+    const {user} = useUser();
 
 
     const GeneratedAIContent = async (formData:any)=>{
@@ -34,8 +39,23 @@ const CreateNewContent = (props:PROPS) => {
       const result = await chatSession.sendMessage(FinalAIPrompt);
 
       setAiOuput(result?.response.text());
+      await SaveInDb(JSON.stringify(formData),selectedTemplate?.slug,result?.response.text());
       setLoading(false);
     }
+
+    const SaveInDb = async(formData:any,slug:any,aiRes:string)=>{
+      const result = await db.insert(aiOuput).values({
+        formData:formData,
+        templateSlug:slug,
+        aiResponse:aiRes,
+        createdBy:user?.primaryEmailAddress?.emailAddress,
+        createdAt:moment().format('DD/MM/yyyy'),
+      });
+      console.log(result);
+
+    }
+
+  
 
   return (
     <div className='p-3'>
