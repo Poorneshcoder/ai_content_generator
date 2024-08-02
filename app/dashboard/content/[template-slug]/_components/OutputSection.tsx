@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useRef } from 'react'
 import '@toast-ui/editor/dist/toastui-editor.css';
 
@@ -21,7 +22,7 @@ const OutputSection = ({aiOuput}:props) => {
     <div className='bg-white shadow-lg border rounded-lg'>
         <div className='flex justify-between items-center p-5'>
             <h2 className='font-medium text-lg'>Your Result</h2>
-            <Button className='flex gap-2'><Copy className='w-4 h-4' />Copy</Button>
+            <Button onClick={()=>navigator.clipboard.writeText(aiOuput)} className='flex gap-2'><Copy className='w-4 h-4' />Copy</Button>
         </div>
         <Editor
         ref={editorRef}
